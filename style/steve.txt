@@ -1,0 +1,61 @@
+import React from 'react';
+import { connect } from 'react-redux';
+import NameField from '../components/namefield'
+import StarField from '../components/starfield'
+import SelectField from '../components/selectbox'
+import {bindActionCreators} from 'redux'
+import {selectRating} from '../actions/index'
+
+class RatingWidget extends React.Component {
+
+  renderRating() {
+    for(let i = 0; i < this.props.ratings.length; i++){
+      console.log(this.props.ratings[i]);
+      this.props.ratings[i].starbox = this.makeStars(this.props.ratings[i].rating, this.props.ratings[i].maxrating)
+    }
+  		return this.props.ratings.map((rating, index) => {
+        let incIndex = index + 1;
+        let changeEvent = this.handleClick;
+        return (
+          <div key={rating.uid} onChange = {(rating = event.value, ratingUID = rating.uid)=>{
+            console.log("in the onChange Event ");
+            console.log("the new Rating is "+ rating + " the id is " + ratingUID);}}  >
+            <NameField names = {rating.name}/>
+            <StarField stars = {rating.starbox}/>
+            <SelectField id ={index + 1} />
+          </div>
+        )
+      })
+  	}
+    handleClick(e){
+      return e.target.value
+    }
+  makeStars(rating, numStars) {
+    let starbox = [];
+    let bstar = "../Images/unclicked.jpg";
+    let fstar = "../Images/clicked.jpg";
+    for (let i = 0; i <numStars; i++){
+      starbox.push(<img src={i < rating ? fstar: bstar} data-key={(i+1)} width= "20" height= "20" key={i} />)
+      }
+    return starbox;
+    }
+
+  render() {
+    return (
+      <div>
+      	{this.renderRating()}
+      </div>
+    )
+  }
+}
+
+  function mapStateToProps(state) {
+    return {
+      ratings: state.ratings
+    };
+  }
+  function mapDispatchToProps(dispatch) {
+    return bindActionCreators({selectRating:selectRating}, dispatch)
+  }
+
+  export default connect(mapStateToProps, mapDispatchToProps)(RatingWidget)
